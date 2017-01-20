@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SA</string>
+    <string name="title_video_list">Videos</string>
+    <string name="title_video_detail">Video Detail</string>
+</resources>
