@@ -1,7 +1,6 @@
 package com.ybg.av.sa.activity
 
 import android.os.Bundle
-import android.support.design.widget.CollapsingToolbarLayout
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.widget.ImageView
 import com.pili.pldroid.player.AVOptions
 import com.pili.pldroid.player.widget.PLVideoView
 import com.ybg.av.sa.R
-import com.ybg.av.sa.utils.Base64Util
 import com.ybg.av.sa.view.MediaController
 
 class VideoDetailFragment : Fragment() {
@@ -32,12 +30,6 @@ class VideoDetailFragment : Fragment() {
         if (arguments.containsKey(VIDEO_URL)) {
             videoTitle = arguments.getString(VIDEO_TITLE)
             videoUrl = arguments.getString(VIDEO_URL)
-
-            val activity = this.activity
-            val appBarLayout = activity.findViewById(R.id.toolbar_layout) as CollapsingToolbarLayout
-            if (appBarLayout != null) {
-                appBarLayout.title = Base64Util.getDecodeString(videoTitle)
-            }
         }
     }
 
@@ -75,9 +67,7 @@ class VideoDetailFragment : Fragment() {
     }
 
     private fun loadingVideo(videoUrl: String) {
-        val id = "c2hvdyUyRjIwMTcwMTA1JTJGMTc0NTNjMTUwM2VjNGJkMDg0ZDQ2NGZhNjgwMjhjMTFfMjIubXA0"
-        val url = "http://120.76.74.2/file/file/download/$id/"
-        mPlayer?.setVideoPath(url)
+        mPlayer?.setVideoPath(videoUrl)
         hasVideo = true
         mPlayer?.start()
     }
