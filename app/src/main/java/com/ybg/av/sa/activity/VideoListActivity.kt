@@ -6,6 +6,8 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -28,6 +30,7 @@ class VideoListActivity : AppCompatActivity() {
     private val pageSize = 10
     private var pageNum = 1
     private var hasMore = true
+    private var catalog = "at"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +40,23 @@ class VideoListActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         toolbar.title = title
 
-        val fab = findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener { view ->
+        val fabPre = findViewById(R.id.fabPre) as FloatingActionButton
+        fabPre.setOnClickListener { view ->
+            if (pageNum > 2) {
+                pageNum +- 1
+                loadVideoList()
+            } else {
+                Toast.makeText(this, "己经是第一页了。", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val fabNext = findViewById(R.id.fabNext) as FloatingActionButton
+        fabNext.setOnClickListener { view ->
             if (hasMore) {
                 pageNum += 1
                 loadVideoList()
+            } else {
+                Toast.makeText(this, "己经是最后一页了。", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -50,7 +65,7 @@ class VideoListActivity : AppCompatActivity() {
         adapter.setListener(listener)
         adapter.setData(videoList)
         recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(SpaceItemDecoration(8))
+        recyclerView.addItemDecoration(SpaceItemDecoration(24))
 
         if (findViewById(R.id.video_detail_container) != null) {
             mTwoPane = true
@@ -59,9 +74,43 @@ class VideoListActivity : AppCompatActivity() {
         loadVideoList()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.video_catalog, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        when(id) {
+            R.id.catalog_at -> {
+                catalog = "at"
+                pageNum = 1
+                loadVideoList()
+            }
+            R.id.catalog_qiju -> {
+                catalog = "qiju"
+                pageNum = 1
+                loadVideoList()
+            }
+            R.id.catalog_guochan -> {
+                catalog = "guochan"
+                pageNum = 1
+                loadVideoList()
+            }
+            R.id.catalog_luanlun -> {
+                catalog = "luanlun"
+                pageNum = 1
+                loadVideoList()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun loadVideoList() {
-        SendRequest.getVideoList(this@VideoListActivity, pageNum, pageSize, object : OkCallback<String>
-        (OkStringParser()){
+        SendRequest.getVideoList(this@VideoListActivity, catalog, pageNum, pageSize, object :
+                OkCallback<String>(OkStringParser()){
             override fun onSuccess(code: Int, response: String) {
                 val jsonBean = JSonResultBean.fromJSON(response)
                 if (jsonBean != null && jsonBean.isSuccess) {
@@ -71,6 +120,9 @@ class VideoListActivity : AppCompatActivity() {
                     if (data.size < pageSize) {
                         hasMore = false
                     }
+                    //清除旧数据
+                    videoList.clear()
+                    //更新
                     videoList.addAll(data)
                     adapter.setData(videoList)
                     adapter.notifyDataSetChanged()
